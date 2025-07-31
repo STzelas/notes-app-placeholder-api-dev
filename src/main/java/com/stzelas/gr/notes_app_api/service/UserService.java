@@ -1,6 +1,7 @@
 package com.stzelas.gr.notes_app_api.service;
 
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectAlreadyExists;
+import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotFoundException;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.mapper.Mapper;
@@ -10,8 +11,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class UserService {
         return mapper.mapToUserReadOnlyDTO(savedUser);
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByUsername(String username) throws AppObjectNotFoundException {
+        return userRepository.findByUsername(username).orElseThrow(() -> new AppObjectNotFoundException("User", "User with username " + username + " not found."));
     }
 }
