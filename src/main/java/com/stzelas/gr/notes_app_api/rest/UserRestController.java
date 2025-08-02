@@ -27,8 +27,8 @@ public class UserRestController {
 
     @PostMapping("/users/register")
     public ResponseEntity<UserReadOnlyDTO> saveUser(
-            @Valid @RequestPart(name = "user")UserInsertDTO userInsertDTO,
-            BindingResult bindingResult) throws ValidationException, AppObjectAlreadyExists, AppServerException {
+            @Valid @RequestBody()UserInsertDTO userInsertDTO,
+            BindingResult bindingResult) throws ValidationException, AppObjectAlreadyExists {
         if (bindingResult.hasErrors())
             throw new ValidationException(bindingResult);
 
@@ -37,7 +37,7 @@ public class UserRestController {
             return new ResponseEntity<>(userReadOnlyDTO, HttpStatus.OK);
         } catch (AppObjectAlreadyExists e) {
             LOGGER.error("Error in saving user because it already exists: ", e);
-            throw new AppServerException("User", "User could not be registered.");
+            throw new AppObjectAlreadyExists("User", "User already exists.");
         }
     }
 }
