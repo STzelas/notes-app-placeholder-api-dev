@@ -1,10 +1,13 @@
 package com.stzelas.gr.notes_app_api.rest;
 
+import com.stzelas.gr.notes_app_api.authentication.AuthenticationService;
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectAlreadyExists;
 import com.stzelas.gr.notes_app_api.core.exceptions.ValidationException;
+import com.stzelas.gr.notes_app_api.dto.AuthenticationRequestDTO;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.mapper.Mapper;
+import com.stzelas.gr.notes_app_api.model.User;
 import com.stzelas.gr.notes_app_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class UserRestController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(UserRestController.class);
     private final UserService userService;
+    private final AuthenticationService authService;
     private final Mapper mapper;
 
     @PostMapping("/users/register")
@@ -38,5 +42,10 @@ public class UserRestController {
             LOGGER.error("Error in saving user because it already exists: ", e);
             throw new AppObjectAlreadyExists("User", "User already exists.");
         }
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody AuthenticationRequestDTO requestDTO) {
+        return authService.authenticate(requestDTO);
     }
 }
