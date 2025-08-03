@@ -1,5 +1,6 @@
 package com.stzelas.gr.notes_app_api.security;
 
+import com.stzelas.gr.notes_app_api.authentication.JwtAuthenticationFilter;
 import com.stzelas.gr.notes_app_api.core.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -7,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,16 +38,18 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    private final JwtAuthenticationFilter jwtAuthFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         return http
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(myCustomAuthenticationEntryPoint()))  // χειρισμός 401,
-                .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(myCustomAccessDeniedHandler()))            // χειρισμός 403
+//                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(myCustomAuthenticationEntryPoint()))  // χειρισμός 401,
+//                .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(myCustomAccessDeniedHandler()))            // χειρισμός 403
                 .authorizeHttpRequests(req -> req                                                                                 // permissions / guards
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/auth/authenticate").permitAll()
                         .requestMatchers("/api/notes/**").hasAnyAuthority(Role.USER.name(), Role.SUPER_ADMIN.name())
@@ -56,7 +58,7 @@ public class SecurityConfiguration {
                 )
                 .sessionManagement((session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))  // είναι με jwt και όχι με login page
                 .authenticationProvider(authenticationProvider())                                       // provider
-//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)            // και φίλτρο
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)            // και φίλτρο
                 .build();
     }
 
@@ -80,6 +82,7 @@ public class SecurityConfiguration {
         return authenticationProvider;
     }
 
+    // jwt
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
             throws Exception {
