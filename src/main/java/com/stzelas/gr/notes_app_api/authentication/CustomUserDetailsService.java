@@ -1,5 +1,7 @@
 package com.stzelas.gr.notes_app_api.authentication;
 
+import com.stzelas.gr.notes_app_api.model.User;
+import com.stzelas.gr.notes_app_api.model.UserPrincipal;
 import com.stzelas.gr.notes_app_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return (UserDetails) userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User with username " + username + " not found");
+        }
+
+        return new UserPrincipal(user);
     }
 }
