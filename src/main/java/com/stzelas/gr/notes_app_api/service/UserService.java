@@ -31,7 +31,4 @@ public class UserService {
         return mapper.mapToUserReadOnlyDTO(savedUser);
     }
 
-    public User findByUsername(String username) throws AppObjectNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(() -> new AppObjectNotFoundException("User", "User with username " + username + " not found."));
-    }
 }
