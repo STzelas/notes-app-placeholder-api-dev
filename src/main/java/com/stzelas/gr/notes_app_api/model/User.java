@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -36,6 +37,7 @@ public class User extends AbstractEntity {
     private String lastname;
 
     @Enumerated(value = EnumType.STRING)
+    @ColumnDefault("'USER'")
     private Role role;
 
     @Column(name = "is_active")
