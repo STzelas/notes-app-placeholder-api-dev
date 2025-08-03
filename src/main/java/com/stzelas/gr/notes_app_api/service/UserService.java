@@ -1,7 +1,6 @@
 package com.stzelas.gr.notes_app_api.service;
 
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectAlreadyExists;
-import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotFoundException;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.mapper.Mapper;
@@ -21,8 +20,8 @@ public class UserService {
     private final Mapper mapper;
 
     @Transactional(rollbackOn = {AppObjectAlreadyExists.class})
-    public UserReadOnlyDTO saveUser(UserInsertDTO userInsertDTO) throws AppObjectAlreadyExists {
-        if (userRepository.findByUsername(userInsertDTO.username()).isPresent()) {
+    public UserReadOnlyDTO register(UserInsertDTO userInsertDTO) throws AppObjectAlreadyExists {
+        if (userRepository.findByUsername(userInsertDTO.username()) != null) {
             throw new AppObjectAlreadyExists("User", "User with username " + userInsertDTO.username() + " already exists.");
         }
 
