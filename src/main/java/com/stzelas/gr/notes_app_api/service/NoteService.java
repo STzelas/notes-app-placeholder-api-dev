@@ -4,7 +4,9 @@ import com.stzelas.gr.notes_app_api.dto.NoteInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.NoteReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.mapper.Mapper;
 import com.stzelas.gr.notes_app_api.model.Note;
+import com.stzelas.gr.notes_app_api.model.User;
 import com.stzelas.gr.notes_app_api.repository.NoteRepository;
+import com.stzelas.gr.notes_app_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class NoteService {
 
 
     private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
     private final Mapper mapper;
 
     public List<Note> getNotes() {
@@ -25,16 +28,16 @@ public class NoteService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public NoteReadOnlyDTO saveNote(NoteInsertDTO noteInsertDTO) {
+    public NoteReadOnlyDTO saveNote(NoteInsertDTO noteInsertDTO, User user) {
 
-        Note note = mapper.mapToNoteEntity(noteInsertDTO);
+        Note note = mapper.mapToNoteEntity(noteInsertDTO, user);
         Note savedNote = noteRepository.save(note);
         return mapper.mapToNoteReadOnlyDTO(savedNote);
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public NoteReadOnlyDTO updateNote(NoteInsertDTO noteInsertDTO) {
-        Note note = mapper.mapToNoteEntity(noteInsertDTO);
+    public NoteReadOnlyDTO updateNote(NoteInsertDTO noteInsertDTO, User user) {
+        Note note = mapper.mapToNoteEntity(noteInsertDTO, user);
         Note savedNote = noteRepository.save(note);
         return mapper.mapToNoteReadOnlyDTO(savedNote);
     }
