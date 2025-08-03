@@ -1,7 +1,6 @@
 package com.stzelas.gr.notes_app_api.rest;
 
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectAlreadyExists;
-import com.stzelas.gr.notes_app_api.core.exceptions.AppServerException;
 import com.stzelas.gr.notes_app_api.core.exceptions.ValidationException;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
@@ -26,14 +25,14 @@ public class UserRestController {
     private final Mapper mapper;
 
     @PostMapping("/users/register")
-    public ResponseEntity<UserReadOnlyDTO> saveUser(
+    public ResponseEntity<UserReadOnlyDTO> register(
             @Valid @RequestBody()UserInsertDTO userInsertDTO,
             BindingResult bindingResult) throws ValidationException, AppObjectAlreadyExists {
         if (bindingResult.hasErrors())
             throw new ValidationException(bindingResult);
 
         try {
-            UserReadOnlyDTO userReadOnlyDTO = userService.saveUser(userInsertDTO);
+            UserReadOnlyDTO userReadOnlyDTO = userService.register(userInsertDTO);
             return new ResponseEntity<>(userReadOnlyDTO, HttpStatus.OK);
         } catch (AppObjectAlreadyExists e) {
             LOGGER.error("Error in saving user because it already exists: ", e);
