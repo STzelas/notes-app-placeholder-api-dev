@@ -18,7 +18,7 @@ public class Note extends AbstractEntity{
     String title;
     String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user;  // owner of note
 }
