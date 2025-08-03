@@ -1,5 +1,6 @@
 package com.stzelas.gr.notes_app_api.mapper;
 
+import com.stzelas.gr.notes_app_api.core.enums.Role;
 import com.stzelas.gr.notes_app_api.dto.NoteInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.NoteReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
@@ -31,6 +32,7 @@ public class Mapper {
         user.setPassword(passwordEncoder.encode(insertDTO.password()));
         user.setFirstname(insertDTO.firstname());
         user.setLastname(insertDTO.lastname());
+        user.setRole(Role.USER); // Every user has USER role. Only one is SUPER_ADMIN, more roles might be added later.
         return user;
     }
 
@@ -41,10 +43,11 @@ public class Mapper {
         );
     }
 
-    public Note mapToNoteEntity(NoteInsertDTO noteInsertDTO) {
+    public Note mapToNoteEntity(NoteInsertDTO noteInsertDTO, User user) {
         Note note = new Note();
         note.setTitle(noteInsertDTO.title());
         note.setContent(noteInsertDTO.content());
+        note.setUser(user);
         return note;
     }
 
