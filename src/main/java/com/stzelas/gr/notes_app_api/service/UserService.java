@@ -8,6 +8,7 @@ import com.stzelas.gr.notes_app_api.model.User;
 import com.stzelas.gr.notes_app_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +28,14 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return mapper.mapToUserReadOnlyDTO(savedUser);
+    }
+
+    public User findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return user;
     }
 
 }
