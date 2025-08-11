@@ -1,5 +1,6 @@
 package com.stzelas.gr.notes_app_api.authentication;
 
+import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotAuthorizedException;
 import com.stzelas.gr.notes_app_api.dto.AuthenticationRequestDTO;
 import com.stzelas.gr.notes_app_api.dto.AuthenticationResponseDTO;
 import com.stzelas.gr.notes_app_api.model.User;
@@ -20,12 +21,17 @@ public class AuthenticationService {
     private final UserRepository userRepository;
 
 
-    public String authenticate(AuthenticationRequestDTO dto) {
+    public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO dto)
+            throws AppObjectNotAuthorizedException {
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.username(), dto.password()));
 
-        if (authentication.isAuthenticated())
-            return jwtService.generateToken(dto.username(), dto.password());
-        return "fail";
+        User user = userRepository.findByUsername(authentication.getName());
+        if (user == null) {
+            throw new AppObjectNotAuthorizedException("User", "User not authorized");
+        }
+        String token = jwtService.generateToken(dto.username(), dto.password());
+        return new AuthenticationResponseDTO(user.getFirstname(), user.getLastname(), token);
+
     }
 }
