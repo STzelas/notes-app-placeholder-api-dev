@@ -1,5 +1,6 @@
 package com.stzelas.gr.notes_app_api.service;
 
+import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotAuthorizedException;
 import com.stzelas.gr.notes_app_api.dto.NoteInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.NoteReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.mapper.Mapper;
@@ -23,8 +24,11 @@ public class NoteService {
     private final UserRepository userRepository;
     private final Mapper mapper;
 
-    public List<Note> getNotes() {
-        return noteRepository.findAll();
+    public List<NoteReadOnlyDTO> getNotes(User user) {
+        List<Note> notes = noteRepository.findByUserId(user.getId());
+        return notes.stream()
+                .map(mapper::mapToNoteReadOnlyDTO)
+                .toList();
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -36,14 +40,24 @@ public class NoteService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public NoteReadOnlyDTO updateNote(NoteInsertDTO noteInsertDTO, User user) {
-        Note note = mapper.mapToNoteEntity(noteInsertDTO, user);
-        Note savedNote = noteRepository.save(note);
+    public NoteReadOnlyDTO updateNote(Long noteId, NoteInsertDTO noteInsertDTO, User user) throws AppObjectNotAuthorizedException {
+        Note existingNote = noteRepository.findByIdAndUserId(noteId, user.getId()).orElseThrow(() -> new AppObjectNotAuthorizedException("Note", "Not found or authorized"));
+
+        if (!existingNote.getUser().getId().equals(user.getId())) {
+            throw new AppObjectNotAuthorizedException("Note", "Not owned by user");
+        }
+        existingNote.setTitle(noteInsertDTO.title());
+        existingNote.setContent(noteInsertDTO.content());
+
+        Note savedNote = noteRepository.save(existingNote);
         return mapper.mapToNoteReadOnlyDTO(savedNote);
     }
 
-    public void deleteNote(Long id) {
-        noteRepository.deleteById(id);
+    public void deleteNote(Long noteId, User user) throws AppObjectNotAuthorizedException {
+        Note note = noteRepository.findByIdAndUserId(noteId, user.getId())
+                .orElseThrow(() -> new AppObjectNotAuthorizedException("Note", "Not found or authorized"));
+
+        noteRepository.delete(note);
     }
 
 }
