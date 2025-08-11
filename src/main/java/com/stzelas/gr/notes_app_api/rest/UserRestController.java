@@ -2,8 +2,10 @@ package com.stzelas.gr.notes_app_api.rest;
 
 import com.stzelas.gr.notes_app_api.authentication.AuthenticationService;
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectAlreadyExists;
+import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotAuthorizedException;
 import com.stzelas.gr.notes_app_api.core.exceptions.ValidationException;
 import com.stzelas.gr.notes_app_api.dto.AuthenticationRequestDTO;
+import com.stzelas.gr.notes_app_api.dto.AuthenticationResponseDTO;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.mapper.Mapper;
@@ -45,7 +47,10 @@ public class UserRestController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody AuthenticationRequestDTO requestDTO) {
-        return authService.authenticate(requestDTO);
+    public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody AuthenticationRequestDTO requestDTO)
+            throws AppObjectNotAuthorizedException {
+        AuthenticationResponseDTO authenticationResponseDTO = authService.authenticate(requestDTO);
+        LOGGER.info("User authenticated");
+        return new ResponseEntity<>(authenticationResponseDTO, HttpStatus.OK);
     }
 }
