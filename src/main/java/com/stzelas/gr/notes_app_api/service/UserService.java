@@ -8,7 +8,6 @@ import com.stzelas.gr.notes_app_api.model.User;
 import com.stzelas.gr.notes_app_api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final Mapper mapper;
 
     @Transactional(rollbackOn = {AppObjectAlreadyExists.class})

@@ -8,8 +8,6 @@ import com.stzelas.gr.notes_app_api.dto.AuthenticationRequestDTO;
 import com.stzelas.gr.notes_app_api.dto.AuthenticationResponseDTO;
 import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
-import com.stzelas.gr.notes_app_api.mapper.Mapper;
-import com.stzelas.gr.notes_app_api.model.User;
 import com.stzelas.gr.notes_app_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,6 @@ public class UserRestController {
     private final Logger LOGGER = LoggerFactory.getLogger(UserRestController.class);
     private final UserService userService;
     private final AuthenticationService authService;
-    private final Mapper mapper;
 
     @PostMapping("/users/register")
     public ResponseEntity<UserReadOnlyDTO> register(
