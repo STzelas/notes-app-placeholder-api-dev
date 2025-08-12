@@ -38,6 +38,7 @@ public class Mapper {
 
     public NoteReadOnlyDTO mapToNoteReadOnlyDTO(Note note) {
         return new NoteReadOnlyDTO(
+                note.getId(),
                 note.getTitle(),
                 note.getContent()
         );
