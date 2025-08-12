@@ -1,7 +1,5 @@
 package com.stzelas.gr.notes_app_api.dto;
 
-import com.stzelas.gr.notes_app_api.model.User;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
