@@ -4,11 +4,13 @@ import com.stzelas.gr.notes_app_api.authentication.AuthenticationService;
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectAlreadyExists;
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotAuthorizedException;
 import com.stzelas.gr.notes_app_api.core.exceptions.ValidationException;
-import com.stzelas.gr.notes_app_api.dto.AuthenticationRequestDTO;
-import com.stzelas.gr.notes_app_api.dto.AuthenticationResponseDTO;
-import com.stzelas.gr.notes_app_api.dto.UserInsertDTO;
-import com.stzelas.gr.notes_app_api.dto.UserReadOnlyDTO;
+import com.stzelas.gr.notes_app_api.dto.*;
 import com.stzelas.gr.notes_app_api.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -27,6 +29,20 @@ public class UserRestController {
     private final UserService userService;
     private final AuthenticationService authService;
 
+    @Operation(
+            summary = "Registers a User",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "User created.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = UserReadOnlyDTO.class)
+                            )
+                    )
+            }
+    )
+    @Tag(name = "Register User")
     @PostMapping("/users/register")
     public ResponseEntity<UserReadOnlyDTO> register(
             @Valid @RequestBody()UserInsertDTO userInsertDTO,
@@ -43,6 +59,20 @@ public class UserRestController {
         }
     }
 
+    @Operation(
+            summary = "Logs a user in/",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "User Log In.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = AuthenticationResponseDTO.class)
+                            )
+                    )
+            }
+    )
+    @Tag(name = "Log In")
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody AuthenticationRequestDTO requestDTO)
             throws AppObjectNotAuthorizedException {
