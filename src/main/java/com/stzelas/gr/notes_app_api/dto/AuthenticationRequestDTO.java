@@ -7,5 +7,4 @@ public record AuthenticationRequestDTO (
         String username,
         @NotNull
         String password
-        //  String token
 ) {}
