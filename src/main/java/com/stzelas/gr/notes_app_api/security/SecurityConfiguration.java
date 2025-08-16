@@ -46,15 +46,15 @@ public class SecurityConfiguration {
         return http
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-//                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(myCustomAuthenticationEntryPoint()))  // χειρισμός 401,
-//                .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(myCustomAccessDeniedHandler()))            // χειρισμός 403
+                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(myCustomAuthenticationEntryPoint()))  // χειρισμός 401,
+                .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(myCustomAccessDeniedHandler()))            // χειρισμός 403
                 .authorizeHttpRequests(req -> req                                                                                 // permissions / guards
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/auth/authenticate").permitAll()
                         .requestMatchers("/api/notes/**").hasAnyAuthority(Role.USER.name(), Role.SUPER_ADMIN.name())
                         .requestMatchers("/api/users/**").hasAnyAuthority(Role.SUPER_ADMIN.name())   // Ποιοι roles έχουν authority
-//                        .requestMatchers("/**").permitAll()   // για τον swagger
+                        .requestMatchers("/**").permitAll()   // για τον swagger
                 )
                 .sessionManagement((session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))  // είναι με jwt και όχι με login page
                 .authenticationProvider(authenticationProvider())                                       // provider
