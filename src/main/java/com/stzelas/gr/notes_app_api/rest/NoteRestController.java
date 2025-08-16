@@ -9,6 +9,11 @@ import com.stzelas.gr.notes_app_api.model.User;
 import com.stzelas.gr.notes_app_api.model.UserPrincipal;
 import com.stzelas.gr.notes_app_api.service.NoteService;
 import com.stzelas.gr.notes_app_api.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,16 +35,50 @@ public class NoteRestController {
     private final Logger LOGGER = LoggerFactory.getLogger(NoteRestController.class);
     private final UserService userService;
 
+    @Operation(
+            summary = "Get all notes from principal",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Get all notes from logged in user.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NoteReadOnlyDTO.class)
+                            )
+                    )
+            }
+    )
+    @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/notes")
-    public List<NoteReadOnlyDTO> getNotes(@AuthenticationPrincipal UserPrincipal principal) {
-        User user = userService.findByUsername(principal.getUsername());
-        return noteService.getNotes(user);
+    public List<NoteReadOnlyDTO> getNotes(@AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
+        try {
+            User user = userService.findByUsername(principal.getUsername());
+            return noteService.getNotes(user);
+        } catch (Exception e) {
+            LOGGER.error("Error getting all the notes: ", e);
+            throw new AppServerException("Note", "Error in getting the notes");
+        }
     }
 
+
+    @Operation(
+            summary = "Save a note",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Note created.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NoteReadOnlyDTO.class)
+                            )
+                    )
+            }
+    )
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/notes/save")
     public ResponseEntity<NoteReadOnlyDTO> saveNote(@Valid @RequestBody()NoteInsertDTO noteInsertDTO,
                                                     @AuthenticationPrincipal UserPrincipal principal)
-                            throws ValidationException, AppServerException {
+                            throws AppServerException {
 
         try {
             NoteReadOnlyDTO savedNote = noteService.saveNote(noteInsertDTO, principal.getUser());
@@ -51,20 +90,55 @@ public class NoteRestController {
         }
     }
 
-    @PutMapping("/notes/{id}")
+    @Operation(
+            summary = "Updates a specified note.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Updates the modified properties from the specified note.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NoteReadOnlyDTO.class)
+                            )
+                    )
+            }
+    )
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PutMapping("/notes/{noteId}")
     public ResponseEntity<NoteReadOnlyDTO> updateNote (
-            @PathVariable Long id,
+            @PathVariable Long noteId,
             @RequestBody NoteInsertDTO noteInsertDTO,
-            @AuthenticationPrincipal UserPrincipal principal) throws AppObjectNotAuthorizedException {
+            @AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
 
-        User user = userService.findByUsername(principal.getUsername());
-        NoteReadOnlyDTO updatedNote = noteService.updateNote(id, noteInsertDTO, user);
-        return ResponseEntity.ok(updatedNote);
+        try {
+            User user = userService.findByUsername(principal.getUsername());
+            NoteReadOnlyDTO updatedNote = noteService.updateNote(noteId, noteInsertDTO, user);
+            return ResponseEntity.ok(updatedNote);
+        } catch (Exception e) {
+            LOGGER.error("Error. Note could not be updated...: ", e);
+            throw new AppServerException("Note", "Note could not be updated.");
+        }
+
     }
 
-    @DeleteMapping("/notes/{id}")
+
+    @Operation(
+            summary = "Deletes a specified note.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Deletes a specified note.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = NoteReadOnlyDTO.class)
+                            )
+                    )
+            }
+    )
+    @SecurityRequirement(name = "Bearer Authentication")
+    @DeleteMapping("/notes/{noteId}")
     public ResponseEntity<?> deleteNote(
-            @PathVariable("id")Long noteId,
+            @PathVariable("noteId")Long noteId,
             @AuthenticationPrincipal UserPrincipal principal) {
 
         User user = userService.findByUsername(principal.getUsername()); // 204
@@ -80,7 +154,7 @@ public class NoteRestController {
             LOGGER.warn("User {} attempted to delete unauthorized or non-existent note with id {}",
                     user.getUsername(), noteId);
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("error", "You are not authorized to delete this note"));
+                    .body(Map.of("error", "You are not authorized to delete this note, or it does not exists."));
         }
     }
 }
