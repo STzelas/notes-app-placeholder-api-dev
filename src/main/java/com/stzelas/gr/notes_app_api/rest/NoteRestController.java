@@ -2,7 +2,6 @@ package com.stzelas.gr.notes_app_api.rest;
 
 import com.stzelas.gr.notes_app_api.core.exceptions.AppObjectNotAuthorizedException;
 import com.stzelas.gr.notes_app_api.core.exceptions.AppServerException;
-import com.stzelas.gr.notes_app_api.core.exceptions.ValidationException;
 import com.stzelas.gr.notes_app_api.dto.NoteInsertDTO;
 import com.stzelas.gr.notes_app_api.dto.NoteReadOnlyDTO;
 import com.stzelas.gr.notes_app_api.model.User;
@@ -14,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -49,6 +49,7 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
+    @Tag(name = "Get all notes")
     @GetMapping("/notes")
     public List<NoteReadOnlyDTO> getNotes(@AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
         try {
@@ -75,6 +76,7 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
+    @Tag(name = "Save a Note")
     @PostMapping("/notes/save")
     public ResponseEntity<NoteReadOnlyDTO> saveNote(@Valid @RequestBody()NoteInsertDTO noteInsertDTO,
                                                     @AuthenticationPrincipal UserPrincipal principal)
@@ -104,6 +106,7 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
+    @Tag(name = "Update a Note")
     @PutMapping("/notes/{noteId}")
     public ResponseEntity<NoteReadOnlyDTO> updateNote (
             @PathVariable Long noteId,
@@ -113,6 +116,7 @@ public class NoteRestController {
         try {
             User user = userService.findByUsername(principal.getUsername());
             NoteReadOnlyDTO updatedNote = noteService.updateNote(noteId, noteInsertDTO, user);
+            LOGGER.info("Note updated successfully.");
             return ResponseEntity.ok(updatedNote);
         } catch (Exception e) {
             LOGGER.error("Error. Note could not be updated...: ", e);
@@ -136,6 +140,7 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
+    @Tag(name = "Delete a Note")
     @DeleteMapping("/notes/{noteId}")
     public ResponseEntity<?> deleteNote(
             @PathVariable("noteId")Long noteId,
