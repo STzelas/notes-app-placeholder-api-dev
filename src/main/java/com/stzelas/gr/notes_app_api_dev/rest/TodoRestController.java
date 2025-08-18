@@ -78,18 +78,29 @@ public class TodoRestController {
     )
     @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/todos/save")
-    public ResponseEntity<TodoReadOnlyDTO> saveTodo(@Valid @RequestBody() TodoInsertDTO todoInsertDTO,
-                                                    @AuthenticationPrincipal UserPrincipal principal)
-            throws AppServerException {
+    public ResponseEntity<?> saveTodo(
+            @Valid
+            @RequestBody() TodoInsertDTO todoInsertDTO,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserPrincipal principal) {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Validation failed. Properties must not be null.")
+            );
+        }
 
         try {
             TodoReadOnlyDTO savedTodo = todoService.saveTodo(todoInsertDTO, principal.getUser());
             LOGGER.info("Todo saved successfully.");
             return ResponseEntity.status(HttpStatus.CREATED).body(savedTodo);
         } catch (Exception e) {
-            LOGGER.error("Error, could not be saved...: ", e);
-            throw new AppServerException("Todo", "Todo could not be created.");
+            LOGGER.error("User {} attempted to save a todo with error: {}",
+                    principal.getUsername(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "You are not authorized to update this todo, or it does not exists."));
         }
+
     }
 
     @Operation(
@@ -107,19 +118,29 @@ public class TodoRestController {
     )
     @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/todos/{todoId}")
-    public ResponseEntity<TodoReadOnlyDTO> updateTodo (
+    public ResponseEntity<?> updateTodo (
+            @Valid
             @PathVariable Long todoId,
             @RequestBody TodoInsertDTO todoInsertDTO,
+            BindingResult bindingResult,
             @AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Validation failed. Properties must not be null.")
+            );
+        }
 
         try {
             User user = userService.findByUsername(principal.getUsername());
             TodoReadOnlyDTO updatedTodo = todoService.updateTodo(todoId, todoInsertDTO, user);
             LOGGER.info("Todo updated successfully.");
             return ResponseEntity.ok(updatedTodo);
-        } catch (Exception e) {
-            LOGGER.error("Error. Todo could not be updated...: ", e);
-            throw new AppServerException("Todo", "Todo could not be updated.");
+        } catch (AppObjectNotAuthorizedException e) {
+            LOGGER.error("User {} attempted to update unauthorized or non-existent todo with id {}, with error: {}",
+                    principal.getUsername(), todoId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "You are not authorized to update this todo, or it does not exists."));
         }
     }
 

@@ -5,10 +5,10 @@ import jakarta.validation.constraints.Size;
 
 public record NoteInsertDTO(
         @NotNull(message = "Title must not be empty.")
-        @Size(min = 3, message = "Title must be at least 3 characters long.")
+        @Size(max = 255, message = "Title must not be more than 255 characters")
         String title,
 
         @NotNull(message = "Note content must not be empty.")
-        @Size(min = 3, message = "Content must be at least 3 characters long.")
+        @Size(max = 1000, message = "Content must not be more than 1000 characters")
         String content
 ) {}
