@@ -52,6 +52,7 @@ public class UserRestController {
 
         try {
             UserReadOnlyDTO userReadOnlyDTO = userService.register(userInsertDTO);
+            LOGGER.info("User successfully registered!");
             return new ResponseEntity<>(userReadOnlyDTO, HttpStatus.OK);
         } catch (AppObjectAlreadyExists e) {
             LOGGER.error("Error in saving user because it already exists: ", e);
