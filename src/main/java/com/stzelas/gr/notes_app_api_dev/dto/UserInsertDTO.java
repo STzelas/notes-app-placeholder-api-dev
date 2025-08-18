@@ -1,6 +1,5 @@
 package com.stzelas.gr.notes_app_api_dev.dto;
 
-import com.stzelas.gr.notes_app_api_dev.core.enums.Role;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
@@ -17,7 +16,5 @@ public record UserInsertDTO(
         String firstname,
         @NotEmpty(message = "Το επίθετο δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το επίθετο πρέπει να είναι τουλάχιστον 3 χαρακτήρες")
-        String lastname,
-
-        Role role
+        String lastname
 ) {}
