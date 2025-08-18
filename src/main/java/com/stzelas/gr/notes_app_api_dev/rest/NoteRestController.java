@@ -81,8 +81,7 @@ public class NoteRestController {
     public ResponseEntity<?> saveNote(@Valid
                                       @RequestBody()NoteInsertDTO noteInsertDTO,
                                       BindingResult bindingResult,
-                                      @AuthenticationPrincipal UserPrincipal principal)
-                            throws AppServerException {
+                                      @AuthenticationPrincipal UserPrincipal principal) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(
                     Map.of("error", "Validation failed. Title and Content must not be null.")
