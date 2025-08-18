@@ -60,11 +60,11 @@ public class UserRestController {
     }
 
     @Operation(
-            summary = "Logs a user in/",
+            summary = "Logs a user in.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "User Log In.",
+                            description = "User Log In with token generation.",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = AuthenticationResponseDTO.class)
