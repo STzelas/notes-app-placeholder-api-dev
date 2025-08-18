@@ -51,8 +51,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req -> req                                                                                 // permissions / guards
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
-                        .requestMatchers("/api/auth/authenticate").permitAll()
                         .requestMatchers("/api/notes/**").hasAnyAuthority(Role.USER.name(), Role.SUPER_ADMIN.name())
+                        .requestMatchers("/api/todos/**").hasAnyAuthority(Role.USER.name(), Role.SUPER_ADMIN.name())
                         .requestMatchers("/api/users/**").hasAnyAuthority(Role.SUPER_ADMIN.name())   // Ποιοι roles έχουν authority
                         .requestMatchers("/**").permitAll()   // για τον swagger
                 )
