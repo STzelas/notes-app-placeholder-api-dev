@@ -21,11 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Note Rest Controller")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -49,7 +51,6 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
-    @Tag(name = "Get all notes")
     @GetMapping("/notes")
     public List<NoteReadOnlyDTO> getNotes(@AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
         try {
@@ -76,11 +77,17 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
-    @Tag(name = "Save a Note")
     @PostMapping("/notes/save")
-    public ResponseEntity<NoteReadOnlyDTO> saveNote(@Valid @RequestBody()NoteInsertDTO noteInsertDTO,
-                                                    @AuthenticationPrincipal UserPrincipal principal)
+    public ResponseEntity<?> saveNote(@Valid
+                                      @RequestBody()NoteInsertDTO noteInsertDTO,
+                                      BindingResult bindingResult,
+                                      @AuthenticationPrincipal UserPrincipal principal)
                             throws AppServerException {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Validation failed. Title and Content must not be null.")
+            );
+        }
 
         try {
             NoteReadOnlyDTO savedNote = noteService.saveNote(noteInsertDTO, principal.getUser());
@@ -88,7 +95,8 @@ public class NoteRestController {
             return ResponseEntity.status(HttpStatus.CREATED).body(savedNote);
         } catch (Exception e) {
             LOGGER.error("Error could not be saved...: ", e);
-            throw new AppServerException("Note", "Note could not be created.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "There was a problem saving your note"));
         }
     }
 
@@ -106,22 +114,32 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
-    @Tag(name = "Update a Note")
     @PutMapping("/notes/{noteId}")
-    public ResponseEntity<NoteReadOnlyDTO> updateNote (
+    public ResponseEntity<?> updateNote (
+            @Valid
             @PathVariable Long noteId,
             @RequestBody NoteInsertDTO noteInsertDTO,
+            BindingResult bindingResult,
             @AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Validation failed. Title and Content must not be null.")
+            );
+        }
 
         try {
             User user = userService.findByUsername(principal.getUsername());
             NoteReadOnlyDTO updatedNote = noteService.updateNote(noteId, noteInsertDTO, user);
             LOGGER.info("Note updated successfully.");
             return ResponseEntity.ok(updatedNote);
-        } catch (Exception e) {
-            LOGGER.error("Error. Note could not be updated...: ", e);
-            throw new AppServerException("Note", "Note could not be updated.");
-        }
+        } catch (AppObjectNotAuthorizedException e) {
+        LOGGER.warn("User {} attempted to update unauthorized or non-existent note with id {}",
+                principal.getUsername(), noteId);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "You are not authorized to delete this note, or it does not exists."));
+    }
+
 
     }
 
@@ -140,7 +158,6 @@ public class NoteRestController {
             }
     )
     @SecurityRequirement(name = "Bearer Authentication")
-    @Tag(name = "Delete a Note")
     @DeleteMapping("/notes/{noteId}")
     public ResponseEntity<?> deleteNote(
             @PathVariable("noteId")Long noteId,
