@@ -1,11 +1,9 @@
 package com.stzelas.gr.notes_app_api_dev.mapper;
 
 import com.stzelas.gr.notes_app_api_dev.core.enums.Role;
-import com.stzelas.gr.notes_app_api_dev.dto.NoteInsertDTO;
-import com.stzelas.gr.notes_app_api_dev.dto.NoteReadOnlyDTO;
-import com.stzelas.gr.notes_app_api_dev.dto.UserInsertDTO;
-import com.stzelas.gr.notes_app_api_dev.dto.UserReadOnlyDTO;
+import com.stzelas.gr.notes_app_api_dev.dto.*;
 import com.stzelas.gr.notes_app_api_dev.model.Note;
+import com.stzelas.gr.notes_app_api_dev.model.Todo;
 import com.stzelas.gr.notes_app_api_dev.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +48,25 @@ public class Mapper {
         note.setContent(noteInsertDTO.content());
         note.setUser(user);
         return note;
+    }
+
+
+    public TodoReadOnlyDTO mapToTodoReadOnlyDTO(Todo todo) {
+        return new TodoReadOnlyDTO(
+                todo.getId(),
+                todo.getDescription(),
+                todo.getImportance(),
+                todo.getIsCompleted()
+        );
+    }
+
+    public Todo mapToTodoEntity(TodoInsertDTO todoInsertDTO, User user) {
+        Todo todo = new Todo();
+        todo.setDescription(todoInsertDTO.description());
+        todo.setImportance(todoInsertDTO.importance());
+        todo.setIsCompleted(todoInsertDTO.isCompleted());
+        todo.setUser(user);
+        return todo;
     }
 
 }
