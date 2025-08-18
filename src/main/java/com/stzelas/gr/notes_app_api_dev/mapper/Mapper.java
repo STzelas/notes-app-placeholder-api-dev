@@ -64,7 +64,7 @@ public class Mapper {
         Todo todo = new Todo();
         todo.setDescription(todoInsertDTO.description());
         todo.setImportance(todoInsertDTO.importance());
-        todo.setIsCompleted(todoInsertDTO.isCompleted());
+        todo.setIsCompleted(false);  // All todos initially are not completed / false.
         todo.setUser(user);
         return todo;
     }

@@ -13,9 +13,6 @@ public record TodoInsertDTO(
         @Size(max = 255, message = "Description must not be more than 255 characters long.")
         String description,
 
-        @NotNull
-        Boolean isCompleted,
-
         @NotNull(message = "Importance must not be empty")
         @Schema(
                 description = "Importance of the todo",
