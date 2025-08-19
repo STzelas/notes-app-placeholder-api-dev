@@ -4,6 +4,7 @@ package com.stzelas.gr.notes_app_api_dev.service;
 import com.stzelas.gr.notes_app_api_dev.core.exceptions.AppObjectNotAuthorizedException;
 import com.stzelas.gr.notes_app_api_dev.dto.TodoInsertDTO;
 import com.stzelas.gr.notes_app_api_dev.dto.TodoReadOnlyDTO;
+import com.stzelas.gr.notes_app_api_dev.dto.TodoUpdateDTO;
 import com.stzelas.gr.notes_app_api_dev.mapper.Mapper;
 import com.stzelas.gr.notes_app_api_dev.model.Todo;
 import com.stzelas.gr.notes_app_api_dev.model.User;
@@ -37,17 +38,14 @@ public class TodoService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public TodoReadOnlyDTO updateTodo(Long todoId, TodoInsertDTO todoInsertDTO, User user) throws AppObjectNotAuthorizedException {
+    public TodoReadOnlyDTO updateTodo(Long todoId, TodoUpdateDTO updateDTO, User user) throws AppObjectNotAuthorizedException {
         Todo existingTodo = todoRepository.findByIdAndUserId(todoId, user.getId()).orElseThrow(() -> new AppObjectNotAuthorizedException("Todo", "Not found or authorized"));
 
         if (!existingTodo.getUser().getId().equals(user.getId())) {
             throw new AppObjectNotAuthorizedException("Todo", "Not owned by user");
         }
-        existingTodo.setDescription(todoInsertDTO.description());
-        existingTodo.setImportance(todoInsertDTO.importance());
-        existingTodo.setIsCompleted(todoInsertDTO.isCompleted());
-
-        Todo savedTodo = todoRepository.save(existingTodo);
+        Todo updatedTodo = mapper.mapToUpdatedTodoEntity(existingTodo, updateDTO);
+        Todo savedTodo = todoRepository.save(updatedTodo);
         return mapper.mapToTodoReadOnlyDTO(savedTodo);
     }
 
