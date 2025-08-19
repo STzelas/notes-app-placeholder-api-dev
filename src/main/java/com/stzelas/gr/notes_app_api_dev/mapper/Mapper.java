@@ -69,4 +69,13 @@ public class Mapper {
         return todo;
     }
 
+    public Todo mapToUpdatedTodoEntity(Todo todo, TodoUpdateDTO todoUpdateDTO) {
+        todo.setDescription(todoUpdateDTO.description());
+        todo.setImportance(todoUpdateDTO.importance());
+        if (todoUpdateDTO.isCompleted() != null) {
+            todo.setIsCompleted(todoUpdateDTO.isCompleted());
+        }
+        return todo;
+    }
+
 }
