@@ -4,6 +4,7 @@ import com.stzelas.gr.notes_app_api_dev.core.exceptions.AppObjectNotAuthorizedEx
 import com.stzelas.gr.notes_app_api_dev.core.exceptions.AppServerException;
 import com.stzelas.gr.notes_app_api_dev.dto.TodoInsertDTO;
 import com.stzelas.gr.notes_app_api_dev.dto.TodoReadOnlyDTO;
+import com.stzelas.gr.notes_app_api_dev.dto.TodoUpdateDTO;
 import com.stzelas.gr.notes_app_api_dev.model.User;
 import com.stzelas.gr.notes_app_api_dev.model.UserPrincipal;
 import com.stzelas.gr.notes_app_api_dev.service.TodoService;
@@ -23,8 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,7 +120,7 @@ public class TodoRestController {
     public ResponseEntity<?> updateTodo (
             @Valid
             @PathVariable Long todoId,
-            @RequestBody TodoInsertDTO todoInsertDTO,
+            @RequestBody TodoUpdateDTO updateDTO,
             BindingResult bindingResult,
             @AuthenticationPrincipal UserPrincipal principal) throws AppServerException {
 
@@ -133,7 +132,7 @@ public class TodoRestController {
 
         try {
             User user = userService.findByUsername(principal.getUsername());
-            TodoReadOnlyDTO updatedTodo = todoService.updateTodo(todoId, todoInsertDTO, user);
+            TodoReadOnlyDTO updatedTodo = todoService.updateTodo(todoId, updateDTO, user);
             LOGGER.info("Todo updated successfully.");
             return ResponseEntity.ok(updatedTodo);
         } catch (AppObjectNotAuthorizedException e) {
