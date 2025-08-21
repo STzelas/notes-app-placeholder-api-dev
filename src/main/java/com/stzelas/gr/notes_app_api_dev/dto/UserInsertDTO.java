@@ -1,6 +1,7 @@
 package com.stzelas.gr.notes_app_api_dev.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UserInsertDTO(
@@ -10,6 +11,8 @@ public record UserInsertDTO(
         String username,
         @NotEmpty(message = "Το password δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το password πρέπει να είναι τουλάχιστον 6 χαρακτήρες")
+        @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])\\S{6,}$",
+                message = "Ο κωδικός πρέπει να περιέχει 1 τουλάχσιτον μικρό και κεφαλαίο γράμμα και 1 αριθμό χωρίς κενά.")
         String password,
         @NotEmpty(message = "Το όνομα δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το password όνομα να είναι τουλάχιστον 3 χαρακτήρες")
