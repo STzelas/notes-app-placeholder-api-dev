@@ -11,6 +11,6 @@ public record NoteInsertDTO(
 
         @NotNull(message = "Note content must not be empty.")
         @Size(min = 1, message = "Content must not be empty")
-        @Size(max = 1000, message = "Content must not be more than 1000 characters")
+        @Size(max = 2000, message = "Content must not be more than 2000 characters")
         String content
 ) {}
