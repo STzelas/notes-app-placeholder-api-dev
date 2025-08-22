@@ -26,10 +26,10 @@ public class Mapper {
 
     public User mapToUserEntity(UserInsertDTO insertDTO) {
         User user = new User();
-        user.setUsername(insertDTO.username());
-        user.setPassword(passwordEncoder.encode(insertDTO.password()));
-        user.setFirstname(insertDTO.firstname());
-        user.setLastname(insertDTO.lastname());
+        user.setUsername(insertDTO.username().trim());
+        user.setPassword(passwordEncoder.encode(insertDTO.password().trim()));
+        user.setFirstname(insertDTO.firstname().trim());
+        user.setLastname(insertDTO.lastname().trim());
         user.setRole(Role.USER); // Every user has USER role. Only one is SUPER_ADMIN, more roles might be added later.
         return user;
     }
