@@ -19,12 +19,14 @@ public class Todo extends AbstractEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(nullable = false)
     String description;
 
     @Column(name = "is_completed")
     Boolean isCompleted;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     Importance importance;
 
     @ManyToOne(fetch = FetchType.LAZY)

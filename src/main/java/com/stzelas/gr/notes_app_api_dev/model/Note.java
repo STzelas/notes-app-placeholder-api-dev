@@ -15,7 +15,10 @@ public class Note extends AbstractEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(nullable = false)
     String title;
+
+    @Column(length = 2000, nullable = false)
     String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
