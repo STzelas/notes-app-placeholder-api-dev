@@ -8,6 +8,7 @@ public record UserInsertDTO(
 
         @NotEmpty(message = "Το username δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το username πρέπει να είναι μεταξύ 4 και 15 χαρακτήρων")
+        @Pattern(regexp = "^\\S+$", message = "Δεν επιτρέπονται white spaces.")
         String username,
         @NotEmpty(message = "Το password δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το password πρέπει να είναι τουλάχιστον 6 χαρακτήρες")
@@ -16,8 +17,10 @@ public record UserInsertDTO(
         String password,
         @NotEmpty(message = "Το όνομα δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το password όνομα να είναι τουλάχιστον 3 χαρακτήρες")
+        @Pattern(regexp = "^\\S+$", message = "Δεν επιτρέπονται white spaces.")
         String firstname,
         @NotEmpty(message = "Το επίθετο δεν μπορεί να είναι κενό")
         @Size(min = 4, max = 15, message = "Το επίθετο πρέπει να είναι τουλάχιστον 3 χαρακτήρες")
+        @Pattern(regexp = "^\\S+$", message = "Δεν επιτρέπονται white spaces.")
         String lastname
 ) {}
